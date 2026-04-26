@@ -181,7 +181,7 @@ const Index = () => {
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none">
                 <Loader2 className="h-8 w-8 text-primary animate-spin" />
                 <span className="text-xs font-medium text-muted-foreground">
-                  {lang === "en" ? "Loading catalog…" : "Загружаем каталог…"}
+                  Loading catalog…
                 </span>
               </div>
             </div>
