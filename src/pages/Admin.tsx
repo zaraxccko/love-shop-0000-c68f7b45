@@ -8,6 +8,7 @@ import { useT } from "@/lib/i18n";
 import { loc } from "@/lib/loc";
 import { COUNTRIES, findDistrict } from "@/data/locations";
 import { useLocationToggles } from "@/store/locationToggles";
+import { useLocationPromos } from "@/store/locationPromos";
 import type { Category, Product, LocalizedString, StashType, VariantStash } from "@/types/shop";
 import { STASH_TYPES } from "@/types/shop";
 import { Button } from "@/components/ui/button";
@@ -1456,6 +1457,9 @@ const LocationsAdmin = ({ onBack }: LocationsAdminProps) => {
   const disabled = useLocationToggles((s) => s.disabled);
   const setDisabled = useLocationToggles((s) => s.setDisabled);
   const isDisabled = (slug: string) => disabled.includes(slug);
+  const promos = useLocationPromos((s) => s.promos);
+  const getPromo = useLocationPromos((s) => s.getPromo);
+  const setPromo = useLocationPromos((s) => s.setPromo);
 
   return (
     <div className="min-h-screen max-w-md mx-auto bg-background px-5 pt-6 pb-10">
@@ -1474,16 +1478,10 @@ const LocationsAdmin = ({ onBack }: LocationsAdminProps) => {
         Отключённые локации показываются в каталоге тусклыми и недоступны для выбора.
       </p>
 
-      <div className="bg-card rounded-2xl shadow-card p-4 mb-4 space-y-2">
-        <div className="font-bold text-sm">Акции фиксированные</div>
-        <div className="text-xs text-muted-foreground">
-          Для всех локаций: 5g → +5g. Для ОАЭ: 5g → +2g, 10g → +5g.
-        </div>
-      </div>
-
       <div className="space-y-4">
         {COUNTRIES.map((country) => {
           const countryOff = isDisabled(country.slug);
+          const promo = getPromo(country.slug);
           return (
             <div key={country.slug} className="bg-card rounded-2xl shadow-card overflow-hidden">
               <div className="flex items-center justify-between p-4">
@@ -1501,6 +1499,40 @@ const LocationsAdmin = ({ onBack }: LocationsAdminProps) => {
                   onCheckedChange={(checked) => setDisabled(country.slug, !checked)}
                 />
               </div>
+
+              {!countryOff && (
+                <div className="border-t px-4 py-3 space-y-2 bg-muted/30">
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                    Акции (подарок в граммах)
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="flex items-center gap-2 text-xs">
+                      <span className="shrink-0">5g →</span>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={promo.giftFor5}
+                        onChange={(e) =>
+                          setPromo(country.slug, { giftFor5: Math.max(0, Number(e.target.value) || 0) })
+                        }
+                        className="h-9"
+                      />
+                    </label>
+                    <label className="flex items-center gap-2 text-xs">
+                      <span className="shrink-0">10g →</span>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={promo.giftFor10}
+                        onChange={(e) =>
+                          setPromo(country.slug, { giftFor10: Math.max(0, Number(e.target.value) || 0) })
+                        }
+                        className="h-9"
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
 
               {!countryOff && country.cities.length > 0 && (
                 <div className="border-t divide-y">
