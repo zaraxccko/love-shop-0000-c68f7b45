@@ -15,17 +15,27 @@ export const Hero = ({ product, onClick }: HeroProps) => {
   const lang = useI18n((s) => s.lang) ?? "ru";
   const citySlug = useLocation((s) => s.city);
   const countrySlug = citySlug ? findCity(citySlug)?.country.slug : undefined;
+  const promo = useLocationPromos((s) => s.getPromo(countrySlug));
 
-  // Pick the smallest variant of >=5g available in the current country to advertise
-  // the "+5g free" promo & price. Falls back to gracefully hiding the price chip.
+  // Выбираем наименьший вариант >=5g, для которого есть подарок в этой стране
   const promoVariant = (() => {
     if (!countrySlug) return null;
     const eligible = (product.variants ?? [])
-      .filter((v) => v.grams >= 5 && v.pricesByCountry?.[countrySlug])
+      .filter((v) => {
+        if (!v.pricesByCountry?.[countrySlug]) return false;
+        if (v.grams >= 10 && promo.giftFor10 > 0) return true;
+        if (v.grams >= 5 && v.grams < 10 && promo.giftFor5 > 0) return true;
+        return false;
+      })
       .sort((a, b) => a.grams - b.grams);
     return eligible[0] ?? null;
   })();
   const promoPrice = promoVariant?.pricesByCountry?.[countrySlug ?? ""];
+  const giftGrams = promoVariant
+    ? promoVariant.grams >= 10
+      ? promo.giftFor10
+      : promo.giftFor5
+    : 0;
 
   return (
     <button
