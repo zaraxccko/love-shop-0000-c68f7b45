@@ -69,9 +69,11 @@ export const Hero = ({ product, onClick }: HeroProps) => {
               {promoVariant.grams}g · ${promoPrice}
             </span>
           )}
-          <span className="bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full shadow-glow">
-            🎁 5+5g {lang === "en" ? "Free" : "в подарок"}
-          </span>
+          {promoVariant && giftGrams > 0 && (
+            <span className="bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full shadow-glow">
+              🎁 {promoVariant.grams}+{giftGrams}g {lang === "en" ? "Free" : "в подарок"}
+            </span>
+          )}
         </div>
       </div>
     </button>
