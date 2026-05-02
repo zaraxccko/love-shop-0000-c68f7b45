@@ -131,9 +131,12 @@ export async function broadcast(opts: {
   text: string;
   imageUrl?: string;
   button?: { text: string; url: string } | null;
+  onProgress?: (stats: { sent: number; failed: number; processed: number; total: number }) => void | Promise<void>;
 }): Promise<{ sent: number; failed: number }> {
   let sent = 0;
   let failed = 0;
+  let processed = 0;
+  const total = opts.recipients.length;
   await Promise.all(
     opts.recipients.map((chatId) =>
       queue.add(async () => {
@@ -145,6 +148,9 @@ export async function broadcast(opts: {
           const desc = err?.response?.body?.description ?? err?.message;
           console.warn(`[broadcast] failed chatId=${chatId}: ${code} — ${desc}`);
           failed++;
+        } finally {
+          processed++;
+          await opts.onProgress?.({ sent, failed, processed, total });
         }
       })
     )
