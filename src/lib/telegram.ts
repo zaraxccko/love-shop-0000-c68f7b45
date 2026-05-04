@@ -18,6 +18,8 @@ interface TelegramWebApp {
   themeParams: Record<string, string>;
   setHeaderColor: (color: string) => void;
   setBackgroundColor: (color: string) => void;
+  openLink?: (url: string, options?: { try_instant_view?: boolean }) => void;
+  openTelegramLink?: (url: string) => void;
   HapticFeedback?: {
     impactOccurred: (style: "light" | "medium" | "heavy" | "rigid" | "soft") => void;
     notificationOccurred: (type: "error" | "success" | "warning") => void;
@@ -80,4 +82,35 @@ export function haptic(type: "light" | "medium" | "success" | "warning" | "error
   } else {
     tg.HapticFeedback.impactOccurred(type);
   }
+}
+
+export function openTelegramProfile(username: string) {
+  const cleanUsername = username.replace(/^@+/, "").trim();
+  if (!cleanUsername) return;
+
+  const webUrl = `https://t.me/${cleanUsername}`;
+  const appUrl = `tg://resolve?domain=${encodeURIComponent(cleanUsername)}`;
+  const tg = getTg();
+
+  try {
+    window.location.href = appUrl;
+  } catch {}
+
+  window.setTimeout(() => {
+    try {
+      tg?.openTelegramLink?.(webUrl);
+    } catch {
+      try {
+        tg?.openLink?.(webUrl, { try_instant_view: false });
+      } catch {}
+    }
+  }, 250);
+
+  window.setTimeout(() => {
+    try {
+      window.open(webUrl, "_blank", "noopener,noreferrer");
+    } catch {
+      window.location.href = webUrl;
+    }
+  }, 700);
 }
