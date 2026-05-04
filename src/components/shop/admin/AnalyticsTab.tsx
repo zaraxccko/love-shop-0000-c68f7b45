@@ -139,6 +139,17 @@ const UserRow = ({ user }: { user: AdminUser }) => {
             href={`https://t.me/${user.username}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => {
+              const tg = (window as any).Telegram?.WebApp;
+              const url = `https://t.me/${user.username}`;
+              if (tg?.openTelegramLink) {
+                e.preventDefault();
+                try { tg.openTelegramLink(url); } catch { try { tg.openLink?.(url); } catch {} }
+              } else if (tg?.openLink) {
+                e.preventDefault();
+                try { tg.openLink(url); } catch {}
+              }
+            }}
             className="text-xs text-primary flex items-center gap-0.5 hover:underline"
           >
             @{user.username} <ExternalLink className="w-3 h-3" />
