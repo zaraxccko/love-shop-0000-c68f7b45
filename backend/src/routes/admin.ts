@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import { prisma } from "../db.js";
-import { requireAdmin } from "../auth/middleware.js";
+import { requireAdmin, requireAdminOrModerator } from "../auth/middleware.js";
 import { env } from "../env.js";
 import { broadcast, bot } from "../bot.js";
 import { serializeProduct, serializeCategory } from "./catalog.js";
@@ -343,7 +343,7 @@ export async function adminRoutes(app: FastifyInstance) {
 
   app.get<{ Querystring: { limit?: string; offset?: string } }>(
     "/admin/users",
-    { preHandler: requireAdmin },
+    { preHandler: requireAdminOrModerator },
     async (req) => {
       const limit = Math.min(Number(req.query.limit ?? 100), 500);
       const offset = Number(req.query.offset ?? 0);
@@ -406,7 +406,7 @@ export async function adminRoutes(app: FastifyInstance) {
 
   // ============== ANALYTICS ==============
 
-  app.get("/admin/analytics", { preHandler: requireAdmin }, async () => {
+  app.get("/admin/analytics", { preHandler: requireAdminOrModerator }, async () => {
     const now = new Date();
     const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
     const startOf7d = new Date(startOfToday); startOf7d.setDate(startOf7d.getDate() - 6);
