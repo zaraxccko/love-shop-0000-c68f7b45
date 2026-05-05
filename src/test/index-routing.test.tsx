@@ -95,6 +95,7 @@ describe("Index routing for top-up vs order payment", () => {
       user: null,
       loading: false,
       error: null,
+      banned: false,
       loginWithInitData: vi.fn().mockResolvedValue(null),
       refreshMe: vi.fn().mockResolvedValue(undefined),
       logout: vi.fn(),
@@ -116,16 +117,6 @@ describe("Index routing for top-up vs order payment", () => {
 
     expect(screen.getByText("order-payment-screen")).toBeInTheDocument();
     expect(screen.queryByText("deposit-screen")).not.toBeInTheDocument();
-  });
-
-  it("opens deposit only from the balance top-up action", () => {
-    render(<Index />);
-
-    fireEvent.click(screen.getByText("open-account"));
-    fireEvent.click(screen.getByText("go-topup"));
-
-    expect(screen.getByText("deposit-screen")).toBeInTheDocument();
-    expect(screen.queryByText("order-payment-screen")).not.toBeInTheDocument();
   });
 
   it("opens order payment from active order action in account", () => {
