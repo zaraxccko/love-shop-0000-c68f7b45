@@ -183,11 +183,12 @@ export const CartSheet = ({ open, onOpenChange, onCheckout }: CartSheetProps) =>
                 ref={deliveryBtnRef}
                 type="button"
                 onClick={handleToggleDelivery}
+                disabled={!canDeliver}
                 className={`w-full mt-2 rounded-2xl p-3 flex items-center gap-3 active:scale-[0.99] transition-colors ${
                   delivery
                     ? "gradient-primary text-primary-foreground shadow-glow"
                     : "bg-card border border-border"
-                }`}
+                } ${!canDeliver ? "opacity-50 cursor-not-allowed active:scale-100" : ""}`}
               >
                 <div
                   className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
@@ -201,7 +202,13 @@ export const CartSheet = ({ open, onOpenChange, onCheckout }: CartSheetProps) =>
                     {lang === "ru" ? "Доставка курьером" : "Courier delivery"}
                   </div>
                   <div className={`text-[11px] ${delivery ? "opacity-80" : "text-muted-foreground"}`}>
-                    {lang === "ru" ? "Применяется ко всему заказу" : "Applied once to the whole order"}
+                    {!canDeliver
+                      ? lang === "ru"
+                        ? "Доступно от 3 г в заказе"
+                        : "Available from 3g in order"
+                      : lang === "ru"
+                        ? "Применяется ко всему заказу"
+                        : "Applied once to the whole order"}
                   </div>
                 </div>
                 <div className="font-bold text-sm">+${DELIVERY_FEE_USD}</div>
