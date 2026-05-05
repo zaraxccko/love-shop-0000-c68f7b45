@@ -305,7 +305,25 @@ export const AnalyticsTab = () => {
               <div className="text-center text-sm text-muted-foreground py-4">Загрузка...</div>
             )}
             {users.map((u) => (
-              <UserRow key={u.tgId} user={u} />
+              <UserRow
+                key={u.tgId}
+                user={u}
+                onToggleBan={async (target) => {
+                  const next = !target.isBanned;
+                  if (next && !confirm(`Заблокировать ${target.username ? "@" + target.username : target.firstName || target.tgId}?`)) return;
+                  try {
+                    const res = await Admin.banUser(target.tgId, next);
+                    setUsers((prev) =>
+                      prev.map((x) => (x.tgId === target.tgId ? { ...x, isBanned: res.isBanned } : x))
+                    );
+                    haptic("success");
+                    toast({ description: res.isBanned ? "Пользователь заблокирован" : "Пользователь разблокирован" });
+                  } catch (e) {
+                    console.error("ban failed", e);
+                    toast({ description: "Не удалось обновить статус", variant: "destructive" });
+                  }
+                }}
+              />
             ))}
             {users.length < usersTotal && (
               <Button
