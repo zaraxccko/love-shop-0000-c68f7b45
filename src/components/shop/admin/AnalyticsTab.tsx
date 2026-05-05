@@ -129,13 +129,21 @@ const FunnelRow = ({
   );
 };
 
-const UserRow = ({ user }: { user: AdminUser }) => {
+const UserRow = ({ user, onToggleBan }: { user: AdminUser; onToggleBan: (u: AdminUser) => void }) => {
   const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || "—";
   const date = new Date(user.createdAt).toLocaleDateString("ru", { day: "2-digit", month: "2-digit", year: "2-digit" });
+  const banned = !!user.isBanned;
   return (
-    <div className="flex items-center gap-3 py-2 px-1 border-b border-border/50 last:border-0">
+    <div className={`flex items-center gap-3 py-2 px-1 border-b border-border/50 last:border-0 ${banned ? "opacity-60" : ""}`}>
       <div className="min-w-0 flex-1">
-        <div className="text-sm font-semibold truncate">{name}</div>
+        <div className="text-sm font-semibold truncate flex items-center gap-1.5">
+          <span className="truncate">{name}</span>
+          {banned && (
+            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive">
+              <Ban className="w-3 h-3" /> Бан
+            </span>
+          )}
+        </div>
         {user.username ? (
           <button
             type="button"
@@ -176,6 +184,19 @@ const UserRow = ({ user }: { user: AdminUser }) => {
           <div className="text-[10px] text-primary font-semibold">{user.ordersCount} заказ(ов)</div>
         )}
       </div>
+      <Button
+        variant={banned ? "outline" : "ghost"}
+        size="sm"
+        className={`shrink-0 h-8 px-2 ${banned ? "" : "text-destructive hover:text-destructive"}`}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onToggleBan(user);
+        }}
+        title={banned ? "Разблокировать" : "Заблокировать"}
+      >
+        {banned ? <ShieldCheck className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+      </Button>
     </div>
   );
 };
