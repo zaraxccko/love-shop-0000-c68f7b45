@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { TabsContent } from "@/components/ui/tabs";
-import { TrendingUp, Users, ShoppingBag, DollarSign, Activity, ChevronDown } from "lucide-react";
+import { TrendingUp, Users, ShoppingBag, DollarSign, Activity, ChevronDown, Ban, ShieldCheck } from "lucide-react";
 import { useAdminPanel } from "@/store/adminPanel";
 import { Admin, type AdminUser } from "@/lib/api";
 import { Button } from "@/components/ui/button";
